@@ -1,3 +1,4 @@
+#include "CtrlFoo.h"
 #include "OSS.h"
 #include <iostream>
 #include "movie.pb.h"
@@ -15,7 +16,7 @@ namespace
     }
 }
 
-void DemoEntry2(int state, int eventid, void *msg, int msgLen, void* data)
+void CtrlFoo::Entry(int state, int eventid, void* msg, int msgLen, void* data)
 {
     if (eventid == EV_STARTUP)
     {

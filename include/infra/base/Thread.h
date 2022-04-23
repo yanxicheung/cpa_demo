@@ -5,7 +5,6 @@
 #include <functional>
 #include "Noncopyable.h"
 using std::function;
-using std::placeholders::_1;
 
 class Thread: Noncopyable
 {

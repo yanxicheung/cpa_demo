@@ -8,6 +8,7 @@ include_directories(
 "${CMAKE_CURRENT_SOURCE_DIR}/include/infra/base"
 "${CMAKE_CURRENT_SOURCE_DIR}/include/infra/log"
 "${CMAKE_CURRENT_SOURCE_DIR}/include/pb"
+"${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
 file(GLOB_RECURSE all_files

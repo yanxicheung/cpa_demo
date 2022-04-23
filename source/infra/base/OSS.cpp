@@ -251,3 +251,57 @@ void OSS_Send(const char *instKey, int eventId, const void* msg, int msgLen)
 {
     oss.send(instKey, eventId, msg, msgLen);
 }
+
+class TimerMsg
+{
+public:
+    uint8_t timerId;
+
+};
+
+class OssTimer: Noncopyable
+{
+public:
+    void KillTimer(uint8_t timerId, uint32_t param)
+    {
+
+    }
+
+    void SetLoopTimer(uint8_t timerId, uint32_t timerLen, uint32_t param)
+    {
+
+    }
+
+    void SetRelativeTimer(uint8_t timerId, uint32_t timerLen, uint32_t param)
+    {
+
+    }
+private:
+
+};
+
+static OssTimer ossTimer;
+
+void OSS_KillTimer(uint8_t timerId, uint32_t param)
+{
+
+}
+
+void OSS_SetLoopTimer(uint8_t timerId, uint32_t timerLen, uint32_t param)
+{
+
+}
+
+void OSS_SetRelativeTimer(uint8_t timerId, uint32_t timerLen, uint32_t param)
+{
+
+}
+
+
+extern uint16_t GetTimerEventId(uint16_t timerId);
+bool OSS_ValidTimer(uint8_t timerId)
+{
+    if(GetTimerEventId(timerId) == 0xFFFF)
+        return false;
+    return true;
+}

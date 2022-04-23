@@ -27,8 +27,8 @@ function exec_on_fail
 ################################################################################
 # comment CC/CXX if you select GCC/G++ default.
 ################################################################################
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
+#export CC=/usr/bin/clang
+#export CXX=/usr/bin/clang++
 
 ################################################################################
 start_exec "generate makefile"
@@ -37,4 +37,4 @@ cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Debug ..
 
 ################################################################################
 exec_on_fail "cmake --build build"
-exec_on_fail "build/fizz-buzz-whizz-test"
+exec_on_fail "build/cpa_demo"
