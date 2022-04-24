@@ -6,17 +6,6 @@
 using namespace std;
 using namespace movie;
 
-#define FOO_TIMER(name)                FOO_##name##_TIMER
-#define FOO_TIMER_DEFAULT_LEN(name)    FOO_##name##_TIMER_DEFAULT_LEN
-#define FOO_TIMER_EV(name)             EV_FOO_##name##_TIMEOUT
-
-#define DEF_TIMER(name, no, len)  \
-const uint8_t  FOO_TIMER(name)             = TIMER_NO_##no; \
-const uint16_t FOO_TIMER_EV(name)          = EV_TIMER_##no; \
-const uint32_t FOO_TIMER_DEFAULT_LEN(name) = len;
-
-DEF_TIMER(DDDD, 1, 100)
-
 namespace
 {
     void sendMovieInfoRequest()

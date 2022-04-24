@@ -301,7 +301,7 @@ void OSS_SetRelativeTimer(uint8_t timerId, uint32_t timerLen, uint32_t param)
 extern uint16_t GetTimerEventId(uint16_t timerId);
 bool OSS_ValidTimer(uint8_t timerId)
 {
-    if(GetTimerEventId(timerId) == 0xFFFF)
-        return false;
-    return true;
+//    if(GetTimerEventId(timerId) == 0xFFFF)
+//        return false;
+//    return true;
 }
