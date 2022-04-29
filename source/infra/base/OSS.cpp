@@ -252,56 +252,41 @@ void OSS_Send(const char *instKey, int eventId, const void* msg, int msgLen)
     oss.send(instKey, eventId, msg, msgLen);
 }
 
-class TimerMsg
+#include "Timer.h"
+class OSSTimer: Noncopyable
 {
 public:
-    uint8_t timerId;
+	OSSTimer()
+	{
+		pMgr = CreateTimerManager();
+	}
 
-};
+	void SetLoopTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb)
+	{
+		CreateTimer(pMgr, cb, pMgr, timerLen, timerLen);
+	}
 
-class OssTimer: Noncopyable
-{
-public:
-    void KillTimer(uint8_t timerId, uint32_t param)
-    {
-
-    }
-
-    void SetLoopTimer(uint8_t timerId, uint32_t timerLen, uint32_t param)
-    {
-
-    }
-
-    void SetRelativeTimer(uint8_t timerId, uint32_t timerLen, uint32_t param)
-    {
-
-    }
+	void SetRelativeTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb)
+	{
+		CreateTimer(pMgr, cb, pMgr, timerLen, 0);
+	}
+	~OSSTimer()
+	{
+		DestroyTimerManager(pMgr);
+	}
 private:
-
+	LPTIMERMANAGER pMgr;
 };
 
-static OssTimer ossTimer;
+static OSSTimer ossTimer;
 
-void OSS_KillTimer(uint8_t timerId, uint32_t param)
+void OSS_SetLoopTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb)
 {
-
+	ossTimer.SetLoopTimer(timerLen, param, cb);
 }
 
-void OSS_SetLoopTimer(uint8_t timerId, uint32_t timerLen, uint32_t param)
+void OSS_SetRelativeTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb)
 {
-
+	ossTimer.SetRelativeTimer(timerLen, param, cb);
 }
 
-void OSS_SetRelativeTimer(uint8_t timerId, uint32_t timerLen, uint32_t param)
-{
-
-}
-
-
-extern uint16_t GetTimerEventId(uint16_t timerId);
-bool OSS_ValidTimer(uint8_t timerId)
-{
-//    if(GetTimerEventId(timerId) == 0xFFFF)
-//        return false;
-//    return true;
-}

@@ -1,15 +1,23 @@
 /*
  * Callbacks.h
  *
- *  Created on: 2022年4月24日
- *      Author: daniel
+ *  Created on: 2022年4月29日
+ *      Author: Administrator
  */
 
-#ifndef H4339A650_E83F_4E9B_8F95_41386B4C93CA
-#define H4339A650_E83F_4E9B_8F95_41386B4C93CA
+#ifndef INCLUDE_INFRA_BASE_CALLBACKS_H_
+#define INCLUDE_INFRA_BASE_CALLBACKS_H_
 
-#include <functional>
+#include<functional>
+using std::function;
 
-typedef std::function<void()> TimerCallback;
+using std::placeholders::_1;
+using std::placeholders::_2;
+using std::placeholders::_3;
+using std::placeholders::_4;
+using std::placeholders::_5;
 
-#endif /* H4339A650_E83F_4E9B_8F95_41386B4C93CA */
+typedef function<void (int state, int eventid, void *msg, int msgLen, void* data)> Entry;
+typedef function<void (void*)> TimerCallback;
+
+#endif /* INCLUDE_INFRA_BASE_CALLBACKS_H_ */

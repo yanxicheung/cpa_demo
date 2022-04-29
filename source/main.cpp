@@ -4,11 +4,6 @@
 #include <functional>
 #include "CtrlFoo.h"
 using namespace std;
-using std::placeholders::_1;
-using std::placeholders::_2;
-using std::placeholders::_3;
-using std::placeholders::_4;
-using std::placeholders::_5;
 
 extern void DemoEntry1(int state, int eventid, void *msg, int msgLen, void* data);
 
