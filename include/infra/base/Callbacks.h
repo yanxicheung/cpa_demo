@@ -10,7 +10,7 @@ using std::placeholders::_3;
 using std::placeholders::_4;
 using std::placeholders::_5;
 
-typedef function<void (int state, int eventid, void *msg, int msgLen, void* data)> Entry;
-typedef function<void (void)> TimerCallback;
+typedef function<void (int state, int eventid, void *msg, int msgLen, void* data)> EntryCallback;
+typedef function<void (void* pParam)> TimerCallback;
 
 #endif /* INCLUDE_INFRA_BASE_CALLBACKS_H_ */

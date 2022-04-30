@@ -32,15 +32,19 @@ typedef struct TIMER_NODE
     uint32_t uExpires;          // 定时器到期时间   绝对时间
     uint32_t uPeriod;           // 定时器触发后，再次触发的间隔时长。如果为 0，表示该定时器为一次性的
     TimerCallback cb;           // 定时器回调函数
+    void *pParam;               // 回调函数的参数
 } TIMERNODE, *LPTIMERNODE;
 
 class TimerWheel: Noncopyable
 {
 public:
     TimerWheel();
-    // uDueTime 首次触发的超时时间间隔。uPeriod 定时器循环周期，若为0，则该定时器只运行一次。
-    void addTimer(uint32_t uDueTime, uint32_t uPeriod, const TimerCallback& cb);
     ~TimerWheel();
+    void setLoopTimer(uint32_t timerLen, const TimerCallback& cb, void *pParam = NULL);
+    void setRelativeTimer(uint32_t timerLen, const TimerCallback& cb, void *pParam = NULL);
+private:
+    // uDueTime 首次触发的超时时间间隔。uPeriod 定时器循环周期，若为0，则该定时器只运行一次。
+    void addTimer(uint32_t uDueTime, uint32_t uPeriod, const TimerCallback& cb, void *pParam);
 private:
     void runTimer();
     void run();

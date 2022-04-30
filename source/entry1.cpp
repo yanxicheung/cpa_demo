@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include "movie.pb.h"
+#include "OSS_Timer.h"
+
 using namespace std;
 using namespace movie;
 
@@ -19,11 +21,6 @@ namespace
         OSS_Send("entry2", msg.Messages_case(), str.c_str(),
         msg.ByteSizeLong());
     }
-
-    void timerCallback()
-    {
-    	cout << "timerCallback" << endl;
-    }
 }
 
 void DemoEntry1(int state, int eventid, void *msg, int msgLen, void* data)
@@ -32,8 +29,11 @@ void DemoEntry1(int state, int eventid, void *msg, int msgLen, void* data)
     {
         cout << "DemoEntry1 Power on" << endl;
         sendMovieInfoRequest();
-
-        OSS_SetLoopTimer(2000, 1000, timerCallback);
+        OSS_SetLoopTimer(TIMER_NO_3, 1000);
+    }
+    else if(eventid == EV_TIMER_3)
+    {
+        cout << "DemoEntry1 EV_TIMER_3:" << eventid << endl;
     }
     else
     {

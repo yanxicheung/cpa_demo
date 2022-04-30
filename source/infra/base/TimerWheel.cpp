@@ -1,17 +1,9 @@
+#include "TimerWheel.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include "Timer.h"
 namespace
 {
-    // 获取基准时间
-    uint32_t GetJiffies_old(void)
-    {
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-    }
-
     uint32_t GetJiffies(void)
     {
         struct timespec ts;  // 精确到纳秒（10 的 -9 次方秒）
@@ -122,7 +114,7 @@ TimerWheel::~TimerWheel()
    DeleteArrayListTimer(arrListTimer5, sizeof(arrListTimer5)/sizeof(arrListTimer5[0]));
 }
 
-void TimerWheel::addTimer(uint32_t uDueTime, uint32_t uPeriod, const TimerCallback& cb)
+void TimerWheel::addTimer(uint32_t uDueTime, uint32_t uPeriod, const TimerCallback& cb, void *pParam)
 {
     if(NULL == cb)
        return;
@@ -132,6 +124,7 @@ void TimerWheel::addTimer(uint32_t uDueTime, uint32_t uPeriod, const TimerCallba
 
     pTmr->uPeriod = uPeriod;
     pTmr->cb = cb;
+    pTmr->pParam = pParam;
     {
        MutexLockGuard lock(mutex);
        pTmr->uExpires = uJiffies + uDueTime;
@@ -232,7 +225,7 @@ void TimerWheel::runTimer()
             // pTmr = (struct TIMER_NODE *)((uint8 *)pListTmrExpire - offsetof(struct TIMER_NODE, ltTimer));
             pTmr = (struct TIMER_NODE *)(pListTmrExpire);
             pListTmrExpire = pListTmrExpire->pNext;
-            pTmr->cb();
+            pTmr->cb(pTmr->pParam);
             //
             if(pTmr->uPeriod != 0)
             {
@@ -263,4 +256,14 @@ uint32_t TimerWheel::cascadeTimer(struct LIST_TIMER *arrListTimer, uint32_t idx)
         addTimer(pTmr);
     }
     return idx;
+}
+
+void TimerWheel::setLoopTimer(uint32_t timerLen, const TimerCallback& cb, void *pParam)
+{
+    addTimer(timerLen, timerLen, cb, pParam);
+}
+
+void TimerWheel::setRelativeTimer(uint32_t timerLen, const TimerCallback& cb, void *pParam)
+{
+    addTimer(timerLen, 0, cb, pParam);
 }

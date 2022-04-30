@@ -37,6 +37,11 @@ void* Thread::threadRoutine(void* arg)
     return NULL;
 }
 
+const pthread_t&  Thread::GetThreadId() const
+{
+    return threadId_;
+}
+
 void Thread::run()
 {
     func_();

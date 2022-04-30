@@ -12,20 +12,21 @@
 class Executor: Noncopyable
 {
 public:
-    Executor(Entry entry, const char* key);
+    Executor(EntryCallback entry, const char* key);
     void addMsg(const Msg& x);
     const std::string& getKey() const;
+    const pthread_t& getThreadId() const;
 private:
     void exec();
 private:
     MutexLock mutex_;
     Condition notEmpty_;
-    std::deque<Msg> msgs;
+    std::deque<Msg> msgs_;
 private:
-    Entry entry;
-    Thread thread;
+    EntryCallback entryCallback_;
+    Thread thread_;
 private:
-    std::string instKey;
+    std::string instKey_;
 };
 
 #endif /* H9FFC891D_1A11_4AFE_80D5_2A7CEB20936F */

@@ -15,9 +15,9 @@ public:
     Msg& operator=(Msg&& rhs);
     Msg& operator=(const Msg& rhs);
 public:
-    int eventId_;
+    uint16_t eventId_;
     void *data_;
-    int len_;
+    uint16_t len_;
     char instKey_[MAX_INST_KEY_LEN];
 private:
     void assignInstKey(const char* instKey);

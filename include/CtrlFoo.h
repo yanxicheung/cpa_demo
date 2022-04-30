@@ -1,16 +1,8 @@
-/*
- * CtrlFoo.h
- *
- *  Created on: 2022Äê4ÔÂ23ÈÕ
- *      Author: daniel
- */
 class CtrlFoo
 {
 public:
-	CtrlFoo():i(0){}
+    CtrlFoo():i(0){}
     void Entry(int state, int eventid, void *msg, int msgLen, void* data);
-private:
-    void Print();
 private:
     int i;
 };

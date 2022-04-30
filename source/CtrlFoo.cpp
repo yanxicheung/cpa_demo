@@ -2,6 +2,7 @@
 #include "OSS.h"
 #include <iostream>
 #include "movie.pb.h"
+#include "OSS_Timer.h"
 using namespace std;
 using namespace movie;
 
@@ -16,32 +17,28 @@ namespace
     }
 }
 
-void CtrlFoo::Print()
-{
-    cout << "CtrlFoo::Print" <<"i="<< i << endl;
-    i++;
-}
-
 void CtrlFoo::Entry(int state, int eventid, void* msg, int msgLen, void* data)
 {
     if (eventid == EV_STARTUP)
     {
-        cout << "DemoEntry2 Power on" << endl;
-
-        OSS_SetLoopTimer(500, 1000, bind(&CtrlFoo::Print,this));
-
-        //OSS_SetRelativeTimer(1000, 0, bind(&CtrlFoo::Print,this,_1));
+        cout << "CtrlFoo Power on" << endl;
+        OSS_SetRelativeTimer(TIMER_NO_3, 1500);
     }
     else if (eventid == Message::kMovieInfoRequest)
     {
-        cout << "DemoEntry2 recv MoveInfoRequest" << endl;
+        cout << "CtrlFoo recv MoveInfoRequest" << endl;
         string str((const char*) msg);
         parseMoveInfoRequest(str);
 
         OSS_Send("entry1", 100, nullptr, 0);
     }
+    else if(eventid == EV_TIMER_3)
+    {
+        cout << "CtrlFoo OSS_SetRelativeTimer" << endl;
+        OSS_SetRelativeTimer(TIMER_NO_3, 1500);
+    }
     else
     {
-        cout << "DemoEntry2 recv unknow event " << eventid << endl;
+        cout << "CtrlFoo recv unknow event " << eventid << endl;
     }
 }

@@ -14,6 +14,7 @@ public:
     ~Thread();
     void start();
     void join();
+    const pthread_t& GetThreadId() const;
 private:
     static void* threadRoutine(void* arg);
     void run();

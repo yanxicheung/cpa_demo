@@ -25,7 +25,7 @@ int main(int argc, char **argv)
         {E_DemoEntry2, std::bind(&CtrlFoo::Entry, &ctrlFooObj, _1, _2, _3, _4, _5), 100, "entry2"}
     };
 
-    OSS_UserEntryRegist((ThreadConfig*)userConfigs, sizeof(userConfigs)/ sizeof(ThreadConfig));
+    OSS_UserRegist((ThreadConfig*)userConfigs, sizeof(userConfigs)/ sizeof(ThreadConfig));
     while (1)
     {
         sleep(1);
