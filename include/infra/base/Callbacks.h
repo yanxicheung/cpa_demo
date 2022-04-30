@@ -1,10 +1,3 @@
-/*
- * Callbacks.h
- *
- *  Created on: 2022Äê4ÔÂ29ÈÕ
- *      Author: Administrator
- */
-
 #ifndef INCLUDE_INFRA_BASE_CALLBACKS_H_
 #define INCLUDE_INFRA_BASE_CALLBACKS_H_
 

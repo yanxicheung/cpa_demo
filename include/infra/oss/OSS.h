@@ -1,9 +1,7 @@
 #ifndef H27857A6C_DBA2_47F9_8204_EF2E7B65A0C9
 #define H27857A6C_DBA2_47F9_8204_EF2E7B65A0C9
-#include<stdint.h>
+#include <stdint.h>
 #include "Callbacks.h"
-
-const uint8_t MAX_INST_KEY_LEN = 32;
 
 enum OSS_EV
 {

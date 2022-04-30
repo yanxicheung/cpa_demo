@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 include_directories( 
 "${CMAKE_CURRENT_SOURCE_DIR}/include/infra/base"
+"${CMAKE_CURRENT_SOURCE_DIR}/include/infra/oss"
 "${CMAKE_CURRENT_SOURCE_DIR}/include/infra/log"
 "${CMAKE_CURRENT_SOURCE_DIR}/include/pb"
 "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -22,6 +23,11 @@ file(GLOB_RECURSE all_files
     source/infra/base/*.cc
     source/infra/base/*.c
     source/infra/base/*.C
+    source/infra/oss/*.cpp
+    source/infra/oss/*.cxx
+    source/infra/oss/*.cc
+    source/infra/oss/*.c
+    source/infra/oss/*.C
     source/pb/*.cc)
 
 add_executable(cpa_demo ${all_files})
