@@ -106,32 +106,32 @@ class OSSTimer: Noncopyable
 public:
     OSSTimer();
 
-    void SetLoopTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb);
+    void SetLoopTimer(uint32_t timerLen, const TimerCallback& cb);
 
-    void SetRelativeTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb);
+    void SetRelativeTimer(uint32_t timerLen, const TimerCallback& cb);
     ~OSSTimer();
 private:
-    LPTIMERMANAGER pMgr;
+    TimerWheel timerWheel;
 };
 
 OSSTimer::OSSTimer()
 {
-    pMgr = CreateTimerManager();
+
 }
 
-void OSSTimer::SetLoopTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb)
+void OSSTimer::SetLoopTimer(uint32_t timerLen, const TimerCallback& cb)
 {
-    CreateTimer(pMgr, cb, pMgr, timerLen, timerLen);
+    timerWheel.addTimer(timerLen, timerLen, cb);
 }
 
-void OSSTimer::SetRelativeTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb)
+void OSSTimer::SetRelativeTimer(uint32_t timerLen, const TimerCallback& cb)
 {
-    CreateTimer(pMgr, cb, pMgr, timerLen, 0);
+    timerWheel.addTimer(timerLen, 0, cb);
 }
 
 OSSTimer::~OSSTimer()
 {
-    DestroyTimerManager(pMgr);
+
 }
 
 ////////////////////////////////////////////////////
@@ -155,10 +155,10 @@ void OSS_Send(const char *instKey, int eventId, const void* msg, int msgLen)
 
 void OSS_SetLoopTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb)
 {
-    ossTimer.SetLoopTimer(timerLen, param, cb);
+    ossTimer.SetLoopTimer(timerLen, cb);
 }
 
 void OSS_SetRelativeTimer(uint32_t timerLen, uint32_t param, const TimerCallback& cb)
 {
-    ossTimer.SetRelativeTimer(timerLen, param, cb);
+    ossTimer.SetRelativeTimer(timerLen, cb);
 }

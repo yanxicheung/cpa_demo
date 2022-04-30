@@ -16,10 +16,10 @@ namespace
     }
 }
 
-void CtrlFoo::Print(void *param)
+void CtrlFoo::Print()
 {
-	cout << "CtrlFoo::Print" <<"i="<< i << endl;
-	i++;
+    cout << "CtrlFoo::Print" <<"i="<< i << endl;
+    i++;
 }
 
 void CtrlFoo::Entry(int state, int eventid, void* msg, int msgLen, void* data)
@@ -28,7 +28,7 @@ void CtrlFoo::Entry(int state, int eventid, void* msg, int msgLen, void* data)
     {
         cout << "DemoEntry2 Power on" << endl;
 
-        OSS_SetLoopTimer(500, 1000, bind(&CtrlFoo::Print,this,_1));
+        OSS_SetLoopTimer(500, 1000, bind(&CtrlFoo::Print,this));
 
         //OSS_SetRelativeTimer(1000, 0, bind(&CtrlFoo::Print,this,_1));
     }
