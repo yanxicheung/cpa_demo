@@ -1,209 +1,79 @@
-#include <iostream>
-#include <vector>
-#include <cstring>
-#include <string>
-#include <assert.h>
 #include "OSS.h"
-#include "TimerWheel.h"
-#include "BlockingQueue.h"
-#include "CountDownLatch.h"
-#include "Thread.h"
-#include "Executor.h"
-#include "OSS_Timer.h"
+#include "MsgQueue.h"
+#include "OSSTimer.h"
+#include <functional>
 
 using namespace std;
 
-CountDownLatch* g_latch = nullptr;
-
-extern uint16_t getTimeoutEvent(uint8_t timerNo);
-
-struct TimerParam
-{
-    TimerParam(pthread_t threadId, uint8_t timerNo):threadId(threadId), timerNo(timerNo){}
-    pthread_t threadId;
-    uint8_t timerNo;
-};
-
-class OSS: Noncopyable
+class OSS
 {
 public:
     OSS();
-    ~OSS();
-    void send(const char *instKey, int eventId, const void* msg, int msgLen);
-    void sendTimeoutEvent(const TimerParam& timerParam);
-    void regist(ThreadConfig* configs, uint16_t size);
-    void poweron();
+    void init();
+    void userRegist(ObserverConfig* configs, uint16_t size);
+    void send(const char* instKey, int eventId, const void* msg, int msgLen);
+    void setLoopTimer(uint8_t timerNo, uint32_t duration);
+    void setRelativeTimer(uint8_t timerNo, uint32_t duration);
 private:
-    void dispatch();
-private:
-    MutexLock mutex_;
-    Condition notEmpty_;
-    std::deque<Msg> msgs_;
-    Thread thread_;
-    vector<Executor*> executors_;
+    MsgQueue msgQueue_;
+    OSSTimer timer_;
 };
 
 OSS::OSS()
-: mutex_(),
-  notEmpty_(mutex_),
-  thread_(std::bind(&OSS::dispatch, this))
-{
-}
-
-OSS::~OSS()
-{
-    thread_.join();
-    for (auto executor : executors_)
-    {
-        delete executor;
-    }
-}
-
-void OSS::send(const char *instKey, int eventId, const void* msg, int msgLen) // 在其他线程中调用;
-{
-    Msg cMsg(instKey, eventId, msg, msgLen);
-    {
-        MutexLockGuard lock(mutex_);
-        msgs_.push_back(move(cMsg));
-        notEmpty_.notify();
-    }
-}
-// fixme race condtion!
-void OSS::sendTimeoutEvent(const TimerParam& timerParam)
-{
-    for (auto &executor : executors_)
-     {
-         if (timerParam.threadId == executor->getThreadId())
-         {
-             uint32_t timeOutEvent = getTimeoutEvent(timerParam.timerNo);
-             auto& key = executor->getKey();
-             send(key.c_str() ,timeOutEvent , nullptr, 0);
-             break;
-         }
-     }
-}
-
-void OSS::regist(ThreadConfig* configs, uint16_t size)
-{
-    assert((configs != nullptr) && (size != 0));
-    g_latch = new CountDownLatch(size);
-    for (int i = 0; i < size; ++i)
-    {
-        auto pExecutor = new Executor(configs[i].entry, configs[i].instKey);
-        assert(pExecutor != nullptr);
-        executors_.push_back(pExecutor);
-    }
-    thread_.start();
-    g_latch->wait();  // 所有工作线程都启动完成后,发送power on 消息;
-    poweron();
-}
-
-void OSS::poweron()
-{
-    send("all", EV_STARTUP, "hello", 6);
-}
-
-void OSS::dispatch()
-{
-    while (true)
-    {
-        while (msgs_.empty())
-        {
-            notEmpty_.wait();
-        }
-        assert(!msgs_.empty());
-        const Msg& msg = msgs_.front();
-        for (auto &executor : executors_)
-        {
-            string instKey(msg.instKey_);
-            if (instKey == "all" || instKey == executor->getKey())
-            {
-                executor->addMsg(msg);
-            }
-        }
-        msgs_.pop_front();
-    }
-}
-
-static OSS gOss;
-
-////////////////////////////////////////////////////////////////////////
-class OSSTimer: Noncopyable
-{
-public:
-    OSSTimer();
-    void setLoopTimer(uint8_t timerNo, uint32_t duration);
-    void setRelativeTimer(uint8_t timerNo, uint32_t duration);
-    ~OSSTimer();
-private:
-    TimerWheel timerWheel;
-};
-
-OSSTimer::OSSTimer()
 {
 
 }
 
-void OSSTimer::setLoopTimer(uint8_t timerNo, uint32_t duration)
+void OSS::init()
 {
-    pthread_t threadId = pthread_self();
-    TimerParam* param = new TimerParam(threadId, timerNo);
-    assert(param != nullptr);
-
-    timerWheel.setLoopTimer(duration, std::bind([](void* param){
-        TimerParam* pTimeParam = (TimerParam*)param;
-        assert(pTimeParam != nullptr);
-        gOss.sendTimeoutEvent(*pTimeParam);
-
-    }, _1), param);
+    timer_.setSendTimeOutCallback(std::bind(&MsgQueue::addTimeoutMsg, &msgQueue_, _1, _2));
 }
 
-void OSSTimer::setRelativeTimer(uint8_t timerNo, uint32_t duration)
+void OSS::userRegist(ObserverConfig* configs, uint16_t size)
 {
-    pthread_t threadId = pthread_self();
-    TimerParam* param = new TimerParam(threadId, timerNo);
-    assert(param != nullptr);
-
-    timerWheel.setRelativeTimer(duration, std::bind([](void* param){
-
-        TimerParam* pTimeParam = (TimerParam*)param;
-        assert(pTimeParam != nullptr);
-        gOss.sendTimeoutEvent(*pTimeParam);
-        delete pTimeParam;
-
-    }, _1), param);
+    msgQueue_.observerRegist(configs, size);
 }
 
-OSSTimer::~OSSTimer()
+void OSS::send(const char* instKey, int eventId, const void* msg, int msgLen)
 {
-
+    msgQueue_.addMsg(instKey, eventId, msg, msgLen);
 }
 
-static OSSTimer gOssTimer;
-////////////////////////////////////////////////////
+void OSS::setLoopTimer(uint8_t timerNo, uint32_t duration)
+{
+    timer_.setLoopTimer(timerNo, duration);
+}
+
+void OSS::setRelativeTimer(uint8_t timerNo, uint32_t duration)
+{
+    timer_.setRelativeTimer(timerNo, duration);
+}
+
+
+static OSS g_OSS;
 
 void OSS_Init()
 {
-
+    g_OSS.init();
 }
 
-void OSS_UserRegist(ThreadConfig* configs, uint16_t size)
+void OSS_UserRegist(ObserverConfig* configs, uint16_t size)
 {
-    gOss.regist(configs, size);
+    g_OSS.userRegist(configs, size);
 }
 
-void OSS_Send(const char *instKey, int eventId, const void* msg, int msgLen)
+void OSS_Send(const char* instKey, int eventId, const void* msg, int msgLen)
 {
-    gOss.send(instKey, eventId, msg, msgLen);
+    g_OSS.send(instKey, eventId, msg, msgLen);
 }
 
 void OSS_SetLoopTimer(uint8_t timerNo, uint32_t duration)
 {
-    gOssTimer.setLoopTimer(timerNo, duration);
+    g_OSS.setLoopTimer(timerNo, duration);
 }
 
 void OSS_SetRelativeTimer(uint8_t timerNo, uint32_t duration)
 {
-    gOssTimer.setRelativeTimer(timerNo, duration);
+    g_OSS.setRelativeTimer(timerNo, duration);
 }
 

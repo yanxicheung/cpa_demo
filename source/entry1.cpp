@@ -1,8 +1,8 @@
+#include <../include/infra/oss/OSSDef.h>
 #include "OSS.h"
 #include <iostream>
 #include <string>
 #include "movie.pb.h"
-#include "OSS_Timer.h"
 
 using namespace std;
 using namespace movie;
@@ -33,7 +33,7 @@ void DemoEntry1(int state, int eventid, void *msg, int msgLen, void* data)
     }
     else if(eventid == EV_TIMER_3)
     {
-        cout << "DemoEntry1 EV_TIMER_3:" << eventid << endl;
+        cout << "DemoEntry1 EV_TIMER_3[1000ms]:" << eventid << endl;
     }
     else
     {

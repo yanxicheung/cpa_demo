@@ -1,6 +1,5 @@
 #include "Executor.h"
 #include <functional>
-extern CountDownLatch* g_latch;
 
 Executor::Executor(EntryCallback entry, const char* key)
 : mutex_(),
@@ -31,7 +30,6 @@ const pthread_t& Executor::getThreadId() const
 
 void Executor::exec()  // 消息处理线程;
 {
-    g_latch->countDown();
     while (true)
     {
         while (msgs_.empty())

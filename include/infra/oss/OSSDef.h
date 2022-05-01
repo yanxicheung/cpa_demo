@@ -2,6 +2,20 @@
 #define HA05DA7BE_0E45_4EF2_83D3_E75A399B38F9
 
 #include <stdint.h>
+#include "Callbacks.h"
+
+enum OSS_EV
+{
+    EV_STARTUP
+};
+
+struct ObserverConfig
+{
+    uint16_t observerType;
+    EntryCallback entry;
+    uint32_t dataRegionSize;
+    const char* instKey;   // 内部通信使用的key
+};
 
 #define    EV_OSS_BEGIN      (uint16_t)(1000)
 

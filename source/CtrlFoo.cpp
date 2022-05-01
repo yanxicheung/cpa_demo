@@ -1,8 +1,8 @@
 #include "CtrlFoo.h"
+#include <../include/infra/oss/OSSDef.h>
 #include "OSS.h"
 #include <iostream>
 #include "movie.pb.h"
-#include "OSS_Timer.h"
 using namespace std;
 using namespace movie;
 
@@ -22,7 +22,7 @@ void CtrlFoo::Entry(int state, int eventid, void* msg, int msgLen, void* data)
     if (eventid == EV_STARTUP)
     {
         cout << "CtrlFoo Power on" << endl;
-        OSS_SetRelativeTimer(TIMER_NO_3, 1500);
+        OSS_SetRelativeTimer(TIMER_NO_3, 2000);
     }
     else if (eventid == Message::kMovieInfoRequest)
     {
@@ -34,7 +34,7 @@ void CtrlFoo::Entry(int state, int eventid, void* msg, int msgLen, void* data)
     }
     else if(eventid == EV_TIMER_3)
     {
-        cout << "CtrlFoo OSS_SetRelativeTimer" << endl;
+        cout << "CtrlFoo OSS_SetRelativeTimer[2000ms]:" <<eventid <<endl;
         OSS_SetRelativeTimer(TIMER_NO_3, 1500);
     }
     else

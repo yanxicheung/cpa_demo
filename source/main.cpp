@@ -19,13 +19,13 @@ int main(int argc, char **argv)
     OSS_Init();
 
     CtrlFoo ctrlFooObj;
-    const ThreadConfig userConfigs[] =
+    const ObserverConfig userConfigs[] =
     {
         {E_DemoEntry1, DemoEntry1, 100, "entry1"},
         {E_DemoEntry2, std::bind(&CtrlFoo::Entry, &ctrlFooObj, _1, _2, _3, _4, _5), 100, "entry2"}
     };
 
-    OSS_UserRegist((ThreadConfig*)userConfigs, sizeof(userConfigs)/ sizeof(ThreadConfig));
+    OSS_UserRegist((ObserverConfig*)userConfigs, sizeof(userConfigs)/ sizeof(ObserverConfig));
     while (1)
     {
         sleep(1);
