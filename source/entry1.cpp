@@ -1,4 +1,4 @@
-#include <../include/infra/oss/OSSDef.h>
+#include "OSSDef.h"
 #include "OSS.h"
 #include <iostream>
 #include <string>
@@ -21,6 +21,14 @@ namespace
         OSS_Send("entry2", msg.Messages_case(), str.c_str(),
         msg.ByteSizeLong());
     }
+
+    void parseMoveInfoResponse(const string& str)
+    {
+        Message msg;
+        msg.ParseFromString(str);
+        cout << msg.DebugString() << endl;
+        MovieInfoResponse rsp = msg.movie_info_response();
+    }
 }
 
 void DemoEntry1(int state, int eventid, void *msg, int msgLen, void* data)
@@ -29,11 +37,12 @@ void DemoEntry1(int state, int eventid, void *msg, int msgLen, void* data)
     {
         cout << "DemoEntry1 Power on" << endl;
         sendMovieInfoRequest();
-        OSS_SetLoopTimer(TIMER_NO_3, 1000);
     }
-    else if(eventid == EV_TIMER_3)
+    else if(eventid == Message::kMovieInfoResponse)
     {
-        cout << "DemoEntry1 EV_TIMER_3[1000ms]:" << eventid << endl;
+        cout << "DemoEntry1 recv MovieInfoResponse" << endl;
+        string str((const char*) msg);
+        parseMoveInfoResponse(str);
     }
     else
     {
