@@ -32,6 +32,7 @@ void Executor::exec()  // 消息处理线程;
 {
     while (true)
     {
+        MutexLockGuard lock(mutex_);
         while (msgs_.empty())
         {
             notEmpty_.wait();

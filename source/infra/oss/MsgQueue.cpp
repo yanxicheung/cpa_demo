@@ -70,6 +70,7 @@ void MsgQueue::dispatch()
 {
     while (true)
     {
+        MutexLockGuard lock(mutex_);
         while (msgs_.empty())
         {
             notEmpty_.wait();

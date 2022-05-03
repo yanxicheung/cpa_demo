@@ -7,22 +7,33 @@ using namespace movie;
 
 namespace
 {
+    void fillBaseInfo(BasicInfo* basicInfo)
+    {
+        basicInfo->set_movie_type(MovieType::science);
+        basicInfo->add_directors("Daniel");
+        basicInfo->add_directors("Jack");
+    }
+
+    void fillScore(Score* score, uint32_t value,const string& comment)
+    {
+        score->set_value(value);
+        score->set_comment(comment);
+    }
+
     void sendMovieInfoResponse(const string&name)
     {
         Message msg;
         MovieInfoResponse* rsp = msg.mutable_movie_info_response();
         rsp->set_name(name);
 
-        auto basicInfo = rsp->mutable_basic_info();
-        basicInfo->set_movie_type(MovieType::other);
+        fillBaseInfo(rsp->mutable_basic_info());
+        fillScore(rsp->add_score_items(),100,"Good");
+        fillScore(rsp->add_score_items(),99,"Perfect");
 
-        auto directors = basicInfo->mutable_directors();
-        directors->Add("foo1");
-        directors->Add("foo2");
-
-        string str;
         cout << "=======sendMovieInfoResponse=========" << endl;
         cout << msg.DebugString() << endl;
+
+        string str;
         msg.SerializeToString(&str);
         OSS_Send("entry1", msg.Messages_case(), str.c_str(), msg.ByteSizeLong());
     }
