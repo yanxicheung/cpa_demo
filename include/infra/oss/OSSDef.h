@@ -3,12 +3,13 @@
 
 #include <stdint.h>
 #include "Callbacks.h"
+#include <memory>
+
+typedef std::shared_ptr<void> Handle;
 
 struct ObserverConfig
 {
-    uint16_t observerType;
     EntryCallback entry;
-    uint32_t dataRegionSize;
     const char* instKey;   // 内部通信使用的key
 };
 

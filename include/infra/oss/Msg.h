@@ -7,11 +7,12 @@ const uint8_t MAX_INST_KEY_LEN = 32;
 class Msg
 {
 public:
+    Msg();
     Msg(Msg&& rhs);
     Msg(const Msg& rhs);
     Msg(const char* instKey, int eventId, const void* data, int len);
     ~Msg();
-
+    bool empty() const;
     Msg& operator=(Msg&& rhs);
     Msg& operator=(const Msg& rhs);
 public:

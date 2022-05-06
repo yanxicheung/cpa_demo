@@ -1,6 +1,6 @@
 #include "Thread.h"
 #include <assert.h>
-
+#include <iostream>
 Thread::Thread(const ThreadFunc& func)
 : func_(func), threadId_(0), started_(false), joined_(false)
 {
@@ -9,6 +9,7 @@ Thread::Thread(const ThreadFunc& func)
 
 Thread::~Thread()
 {
+    std::cout<<"~Thread()"<<"started_:"<<started_ <<" joined_:" << joined_<<std::endl;
     if (started_ && !joined_)
     {
         pthread_detach(threadId_);

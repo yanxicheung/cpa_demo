@@ -10,7 +10,7 @@ class OSS
 public:
     OSS();
     void init();
-    void userRegist(ObserverConfig* configs, uint16_t size);
+    Handle userRegist(const ObserverConfig& config);
     void send(const char* instKey, int eventId, const void* msg, int msgLen);
     void setLoopTimer(uint8_t timerNo, uint32_t duration);
     void setRelativeTimer(uint8_t timerNo, uint32_t duration);
@@ -29,9 +29,9 @@ void OSS::init()
     timer_.setSendTimeOutCallback(std::bind(&MsgQueue::addTimeoutMsg, &msgQueue_, _1, _2));
 }
 
-void OSS::userRegist(ObserverConfig* configs, uint16_t size)
+Handle OSS::userRegist(const ObserverConfig& config)
 {
-    msgQueue_.observerRegist(configs, size);
+    return msgQueue_.observerRegist(config);
 }
 
 void OSS::send(const char* instKey, int eventId, const void* msg, int msgLen)
@@ -57,9 +57,9 @@ void OSS_Init()
     g_OSS.init();
 }
 
-void OSS_UserRegist(ObserverConfig* configs, uint16_t size)
+Handle OSS_UserRegist(const ObserverConfig& config)
 {
-    g_OSS.userRegist(configs, size);
+    return g_OSS.userRegist(config);
 }
 
 void OSS_Send(const char* instKey, int eventId, const void* msg, int msgLen)

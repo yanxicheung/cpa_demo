@@ -5,7 +5,7 @@
 
 void OSS_Init();
 
-void OSS_UserRegist(ObserverConfig* configs, uint16_t size);
+Handle OSS_UserRegist(const ObserverConfig& config);
 
 void OSS_Send(const char* instKey, int eventId, const void* msg, int msgLen);
 

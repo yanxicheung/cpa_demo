@@ -16,6 +16,7 @@ public:
     void addMsg(const Msg& x);
     const std::string& getKey() const;
     const pthread_t& getThreadId() const;
+    ~Executor();
 private:
     void exec();
 private:
@@ -27,6 +28,7 @@ private:
     Thread thread_;
 private:
     std::string instKey_;
+    bool running_;
 };
 
 #endif /* H9FFC891D_1A11_4AFE_80D5_2A7CEB20936F */

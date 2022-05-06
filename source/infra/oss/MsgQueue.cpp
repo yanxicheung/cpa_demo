@@ -1,5 +1,4 @@
 #include "MsgQueue.h"
-#include "Executor.h"
 #include <string>
 #include <functional>
 #include <iostream>
@@ -9,80 +8,102 @@
 using std::string;
 
 MsgQueue::MsgQueue()
-: mutex_(),
-  notEmpty_(mutex_),
-  thread_(std::bind(&MsgQueue::dispatch, this))
+: queueMutex_(),
+  notEmpty_(queueMutex_),
+  thread_(std::bind(&MsgQueue::dispatch, this)),
+  executorsMutex_(),
+  executors_(new executorList)
 {
+    thread_.start();
 }
 
 MsgQueue::~MsgQueue()
 {
-    thread_.join();
-    for (auto executor : executors_)
-    {
-        delete executor;
-    }
+
 }
 
 void MsgQueue::addMsg(const char *instKey, int eventId, const void* msg, int msgLen) // 在其他线程中调用;
 {
     Msg cMsg(instKey, eventId, msg, msgLen);
     {
-        MutexLockGuard lock(mutex_);
+        MutexLockGuard lock(queueMutex_);
         msgs_.push_back(std::move(cMsg));
         notEmpty_.notify();
     }
 }
 
-// fixme race condtion!
 void MsgQueue::addTimeoutMsg(const pthread_t& threadId, uint16_t timeOutEvent)
 {
-    for (auto &executor : executors_)
-     {
-         if (threadId == executor->getThreadId())
-         {
-             auto& key = executor->getKey();
-             addMsg(key.c_str() ,timeOutEvent , nullptr, 0);
-             break;
-         }
-     }
-}
-
-void MsgQueue::observerRegist(ObserverConfig* configs, uint16_t size)
-{
-    assert((configs != nullptr) && (size != 0));
-    for (int i = 0; i < size; ++i)
+    shared_ptr<executorList> executors;
     {
-        auto pExecutor = new Executor(configs[i].entry, configs[i].instKey);
-        assert(pExecutor != nullptr);
-        executors_.push_back(pExecutor);
+        MutexLockGuard lock(executorsMutex_);
+        executors = executors_;
+        assert(!executors.unique());
     }
-    thread_.start();
-    poweron();
+
+    for (auto iter = executors->begin();iter!= executors->end();++iter)
+    {
+        shared_ptr<Executor>  pExecutor(iter->lock());
+        if (pExecutor && threadId == pExecutor->getThreadId())
+        {
+            auto& key = pExecutor->getKey();
+            addMsg(key.c_str() ,timeOutEvent , nullptr, 0);
+            break;
+        }
+    }
 }
 
-void MsgQueue::poweron()
+void MsgQueue::addObserver(const std::shared_ptr<Executor>& pExecutor)
 {
-    addMsg("all", EV_STARTUP, "hello", 6);
+    MutexLockGuard lock(executorsMutex_);
+    if(!executors_.unique()) // executors_ is read in dispatch
+    {
+        std::cout<< "=======copy on write======="<<std::endl;
+        executors_.reset(new executorList(*executors_));
+    }
+    assert(executors_.unique());
+    executors_->push_back(pExecutor);
+    std::cout<< "addObserver :"<< executors_->size()<<std::endl;
+}
+
+Handle MsgQueue::observerRegist(const ObserverConfig& config)
+{
+    shared_ptr<Executor> pExecutor(new Executor(config.entry, config.instKey));
+    addObserver(pExecutor);
+    poweron(config.instKey);
+    return pExecutor;
+}
+
+void MsgQueue::poweron(const char* instKey)
+{
+    addMsg(instKey, EV_STARTUP, "hello", 6);
 }
 
 void MsgQueue::dispatch()
 {
     while (true)
     {
-        MutexLockGuard lock(mutex_);
+        MutexLockGuard lock(queueMutex_);
         while (msgs_.empty())
         {
             notEmpty_.wait();
         }
         assert(!msgs_.empty());
         const Msg& msg = msgs_.front();
-        for (auto &executor : executors_)
+
+        shared_ptr<executorList> executors;
         {
+            MutexLockGuard lock(executorsMutex_);
+            executors = executors_;
+            assert(!executors.unique());
+        }
+        for(auto iter = executors->begin();iter!= executors->end();++iter)
+        {
+            shared_ptr<Executor>  pExecutor(iter->lock());
             string instKey(msg.instKey_);
-            if (instKey == "all" || instKey == executor->getKey())
+            if (pExecutor && instKey == pExecutor->getKey())
             {
-                executor->addMsg(msg);
+                pExecutor->addMsg(msg);
             }
         }
         msgs_.pop_front();

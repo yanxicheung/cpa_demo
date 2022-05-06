@@ -4,6 +4,16 @@
 #include <string>
 #include <assert.h>
 
+Msg::Msg():eventId_(0), data_(nullptr), len_(0)
+{
+    memset(instKey_, 0, sizeof(instKey_));
+}
+
+bool Msg::empty() const
+{
+    return eventId_ == 0 && len_ == 0;
+}
+
 Msg::Msg(const char* instKey, int eventId, const void* data, int len)
      :eventId_(eventId), data_(nullptr), len_(0)
 {
