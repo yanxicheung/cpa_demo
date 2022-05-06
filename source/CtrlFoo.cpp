@@ -27,3 +27,9 @@ void CtrlFoo::Entry(int state, int eventid, void* msg, int msgLen, void* data)
         cout << "CtrlFoo recv unknow event " << eventid << endl;
     }
 }
+
+
+CtrlFoo::~CtrlFoo()
+{
+    cout << "CtrlFoo::~CtrlFoo()"<< endl;
+}
