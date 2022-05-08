@@ -17,6 +17,7 @@
 `cpa_demo`的物理设计如下：
 
 ```shell
+.
 ├── build.sh
 ├── CMakeLists.txt
 ├── include
@@ -33,6 +34,7 @@
 │   │   │   └── TimerWheel.h
 │   │   ├── log
 │   │   └── oss
+│   │       ├── Cleaner.h
 │   │       ├── Executor.h
 │   │       ├── Msg.h
 │   │       ├── MsgQueue.h
@@ -46,12 +48,14 @@
 └── source
     ├── CtrlFoo.cpp
     ├── entry1.cpp
+    ├── entry2.cpp
     ├── infra
     │   ├── base
     │   │   ├── Thread.cpp
     │   │   └── TimerWheel.cpp
     │   ├── log
     │   └── oss
+    │       ├── Cleaner.cpp
     │       ├── Executor.cpp
     │       ├── Msg.cpp
     │       ├── MsgQueue.cpp
@@ -60,7 +64,6 @@
     ├── main.cpp
     └── pb
         └── movie.pb.cc
-
 ```
 
  `build.sh`为一键编译、运行脚本。
@@ -101,9 +104,11 @@ Handle OSS_UserRegist(const ObserverConfig& config);
 
 将业务模块注册到`OSS`，注册后`OSS`会为业务模块分配消息队列、线程资源。
 
-返回一个`Handle`，这个`Handle`代表`OSS`为业务模块分配的资源。**Handle值一定要用一个变量保存**，否则分配的资源将被自动释放。
+返回句柄`Handle`，`Handle`代表`OSS`为业务模块分配的资源。
 
-如果需要手动释放资源可以调用`Handle`的`reset`方法。
+**Handle值一定要用一个变量保存**，否则分配的资源将被自动释放，无法使用。
+
+手动释放资源调用`OSS_UserUnregist`。
 
 
 
@@ -146,14 +151,24 @@ int main(int argc, char **argv)
         sleep(1);
         if(cnt == 10)  // release
         {
-            h1.reset();
-            h2.reset();
-            h3.reset();
+            OSS_UserUnregist(h1);
+            OSS_UserUnregist(h2);
+            OSS_UserUnregist(h3);
         }
     }
     return 0;
 }
 ```
+
+
+
+## OSS_UserUnregist
+
+```cpp
+void OSS_UserUnregist(Handle& handle);
+```
+
+参数值为`OSS_UserRegist`的返回值，调用后由`OSS`释放`handle`对应的资源（线程、消息队列）。
 
 
 
