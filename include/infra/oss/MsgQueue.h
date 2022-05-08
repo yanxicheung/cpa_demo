@@ -2,7 +2,6 @@
 #ifndef H416EBFF0_B6F3_4122_8549_E347482AE4A9
 #define H416EBFF0_B6F3_4122_8549_E347482AE4A9
 #include "Noncopyable.h"
-#include "BlockingQueue.h"
 #include "CountDownLatch.h"
 #include "Thread.h"
 #include "Msg.h"

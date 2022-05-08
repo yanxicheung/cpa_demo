@@ -7,6 +7,8 @@ void OSS_Init();
 
 Handle OSS_UserRegist(const ObserverConfig& config);
 
+void OSS_UserUnregist(Handle& handle);
+
 void OSS_Send(const char* instKey, int eventId, const void* msg, int msgLen);
 
 void OSS_SetLoopTimer(uint8_t timerNo, uint32_t duration);

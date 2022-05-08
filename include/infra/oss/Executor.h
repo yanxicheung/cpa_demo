@@ -1,7 +1,6 @@
 #ifndef H9FFC891D_1A11_4AFE_80D5_2A7CEB20936F
 #define H9FFC891D_1A11_4AFE_80D5_2A7CEB20936F
 
-#include "BlockingQueue.h"
 #include "CountDownLatch.h"
 #include "Thread.h"
 #include "Callbacks.h"

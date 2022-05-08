@@ -58,12 +58,10 @@ void MsgQueue::addObserver(const std::shared_ptr<Executor>& pExecutor)
     MutexLockGuard lock(executorsMutex_);
     if(!executors_.unique()) // executors_ is read in dispatch
     {
-        std::cout<< "=======copy on write======="<<std::endl;
         executors_.reset(new executorList(*executors_));
     }
     assert(executors_.unique());
     executors_->push_back(pExecutor);
-    std::cout<< "addObserver :"<< executors_->size()<<std::endl;
 }
 
 Handle MsgQueue::observerRegist(const ObserverConfig& config)

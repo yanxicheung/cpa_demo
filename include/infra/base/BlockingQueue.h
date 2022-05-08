@@ -3,9 +3,10 @@
 
 #include "Condition.h"
 #include "Mutex.h"
-
 #include <deque>
 #include <assert.h>
+#include <iostream>
+using namespace std;
 
 template<typename T>
 class BlockingQueue: Noncopyable
@@ -20,6 +21,13 @@ public:
     {
         MutexLockGuard lock(mutex_);
         queue_.push_back(x);
+        notEmpty_.notify();
+    }
+
+    void put(T&& x)
+    {
+        MutexLockGuard lock(mutex_);
+        queue_.push_back(forward<T>(x)); // must perfect forward!
         notEmpty_.notify();
     }
 

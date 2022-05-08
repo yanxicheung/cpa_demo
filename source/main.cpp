@@ -34,9 +34,9 @@ int main(int argc, char **argv)
         sleep(1);
         if(cnt == 10)  // release
         {
-            h1.reset();
-            h2.reset();
-            h3.reset();
+            OSS_UserUnregist(h1);
+            OSS_UserUnregist(h2);
+            OSS_UserUnregist(h3);
         }
     }
     return 0;
