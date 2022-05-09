@@ -34,13 +34,8 @@ void MsgQueue::addMsg(const char *instKey, int eventId, const void* msg, int msg
 
 void MsgQueue::addTimeoutMsg(const pthread_t& threadId, uint16_t timeOutEvent)
 {
-    shared_ptr<executorList> executors;
-    {
-        MutexLockGuard lock(executorsMutex_);
-        executors = executors_;
-        assert(!executors.unique());
-    }
-
+    shared_ptr<executorList> executors = GetExecutors();
+    assert(!executors.unique());
     for (auto iter = executors->begin();iter!= executors->end();++iter)
     {
         shared_ptr<Executor>  pExecutor(iter->lock());
@@ -56,7 +51,7 @@ void MsgQueue::addTimeoutMsg(const pthread_t& threadId, uint16_t timeOutEvent)
 void MsgQueue::addObserver(const std::shared_ptr<Executor>& pExecutor)
 {
     MutexLockGuard lock(executorsMutex_);
-    if(!executors_.unique()) // executors_ is read in dispatch
+    if(!executors_.unique()) //if executors_ is read in dispatch, we copy on write
     {
         executors_.reset(new executorList(*executors_));
     }
@@ -74,7 +69,7 @@ Handle MsgQueue::observerRegist(const ObserverConfig& config)
 
 void MsgQueue::poweron(const char* instKey)
 {
-    addMsg(instKey, EV_STARTUP, "hello", 6);
+    addMsg(instKey, EV_STARTUP, nullptr, 0);
 }
 
 void MsgQueue::dispatch()
@@ -89,12 +84,8 @@ void MsgQueue::dispatch()
         assert(!msgs_.empty());
         const Msg& msg = msgs_.front();
 
-        shared_ptr<executorList> executors;
-        {
-            MutexLockGuard lock(executorsMutex_);
-            executors = executors_;
-            assert(!executors.unique());
-        }
+        shared_ptr<executorList> executors = GetExecutors();
+        assert(!executors.unique());
         for(auto iter = executors->begin();iter!= executors->end();++iter)
         {
             shared_ptr<Executor>  pExecutor(iter->lock());
@@ -107,3 +98,4 @@ void MsgQueue::dispatch()
         msgs_.pop_front();
     }
 }
+

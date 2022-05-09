@@ -5,7 +5,7 @@
 #include "Thread.h"
 
 // 资源释放线程;
-class Cleaner
+class Cleaner: Noncopyable
 {
 public:
     Cleaner();

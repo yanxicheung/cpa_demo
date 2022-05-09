@@ -14,14 +14,19 @@ using std::shared_ptr;
 class MsgQueue: Noncopyable
 {
 public:
-    typedef std::vector<weak_ptr<Executor>> executorList;
     MsgQueue();
     ~MsgQueue();
+    Handle observerRegist(const ObserverConfig& config);
     void addMsg(const char *instKey, int eventId, const void* msg, int msgLen);
     void addTimeoutMsg(const pthread_t& threadId, uint16_t timeOutEvent);
-    Handle observerRegist(const ObserverConfig& config);
-    void poweron(const char* instKey);
 private:
+    typedef std::vector<weak_ptr<Executor>> executorList;
+    void poweron(const char* instKey);
+    shared_ptr<executorList> GetExecutors() const
+    {
+        MutexLockGuard lock(executorsMutex_);
+        return executors_;
+    }
     void addObserver(const shared_ptr<Executor>& pExecutor);
     void dispatch();
 private:
@@ -30,7 +35,7 @@ private:
     std::deque<Msg> msgs_;
     Thread thread_;
 private:
-    MutexLock executorsMutex_;
+    mutable MutexLock executorsMutex_;
     shared_ptr<executorList> executors_;
 };
 
