@@ -4,7 +4,6 @@
 #include "OSSDef.h"
 #include "Thread.h"
 
-// 资源释放线程;
 class Cleaner: Noncopyable
 {
 public:

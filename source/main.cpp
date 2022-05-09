@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     {
         cnt++;
         sleep(1);
-        if(cnt == 10)  // release
+        if(cnt == 5)  // release
         {
             OSS_UserUnregist(h1);
             OSS_UserUnregist(h2);

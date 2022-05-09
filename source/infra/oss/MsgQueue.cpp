@@ -5,7 +5,7 @@
 #include <utility>
 #include "OSSDef.h"
 
-using std::string;
+using namespace std;
 
 MsgQueue::MsgQueue()
 : queueMutex_(),
@@ -59,9 +59,35 @@ void MsgQueue::addObserver(const std::shared_ptr<Executor>& pExecutor)
     executors_->push_back(pExecutor);
 }
 
+void MsgQueue::removeExecutor(Executor* p)
+{
+    // this is safe, because MsgQueue's life is Entire program life cycle
+    MutexLockGuard lock(executorsMutex_);
+    if(!executors_.unique()) //if executors_ is read in dispatch, we copy on write
+    {
+        executors_.reset(new executorList(*executors_));
+    }
+    assert(executors_.unique());
+
+    auto iter = executors_->begin();
+    while(iter!= executors_->end())
+    {
+        if(iter->expired())
+        {
+            iter = executors_->erase(iter);
+        }
+        else
+        {
+            ++iter;
+        }
+    }
+    delete p;
+}
+
 Handle MsgQueue::observerRegist(const ObserverConfig& config)
 {
-    shared_ptr<Executor> pExecutor(new Executor(config.entry, config.instKey));
+    shared_ptr<Executor> pExecutor(new Executor(config.entry, config.instKey),
+                                   std::bind(&MsgQueue::removeExecutor, this, _1));
     addObserver(pExecutor);
     poweron(config.instKey);
     return pExecutor;

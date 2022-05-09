@@ -29,6 +29,7 @@ private:
     }
     void addObserver(const shared_ptr<Executor>& pExecutor);
     void dispatch();
+    void removeExecutor(Executor* pExecutor);
 private:
     MutexLock queueMutex_;
     Condition notEmpty_;
