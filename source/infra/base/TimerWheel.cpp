@@ -118,7 +118,8 @@ void TimerWheel::addTimer(uint32_t uDueTime, uint32_t uPeriod, const TimerCallba
 {
     if(NULL == cb)
        return;
-    LPTIMERNODE pTmr = (LPTIMERNODE)malloc(sizeof(TIMERNODE));
+    LPTIMERNODE pTmr = new TIMERNODE;
+  //  LPTIMERNODE pTmr = (LPTIMERNODE)malloc(sizeof(TIMERNODE));
     if(pTmr == NULL)
         return;
 
@@ -232,7 +233,10 @@ void TimerWheel::runTimer()
                 pTmr->uExpires = this->uJiffies + pTmr->uPeriod;
                 addTimer(pTmr);
             }
-            else free(pTmr);
+            else
+            {
+            	delete pTmr;
+            }
         }
         this->uJiffies++;
     }
